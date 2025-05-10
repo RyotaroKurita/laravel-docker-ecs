@@ -31,7 +31,7 @@
     php artisan key:generate
     ```
 
-    ⚠️ `.env` ファイルの取り扱いについては、後述の注意事項に気をつけてください。⚠️
+    ⚠️ `.env` ファイルの取り扱いについては、後述の運用時の決まり事に気をつけてください。⚠️
 
 3. 必要に応じてデータベースのマイグレーションを実行します。
 
@@ -51,9 +51,9 @@
 
 ## 各コンテナのブラウザ URL
 
-- メイン: `http://localhost:3000`
-- phpMyAdmin: `http://localhost:8080`
-- Mailpit: `http://localhost:4000`
+- メイン　　　： `http://localhost:3000`
+- phpMyAdmin： `http://localhost:8080`
+- Mailpit　　： `http://localhost:4000`
 
 ## ディレクトリ構成
 

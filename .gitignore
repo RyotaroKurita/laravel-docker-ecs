@@ -1,0 +1,7 @@
+.env*
+!.env.init
+!.env.example
+!.env*.encrypted
+
+# mail log
+mailpit/

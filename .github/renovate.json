@@ -1,0 +1,41 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:base"],
+  "schedule": ["every sunday"],
+  "timezone": "Asia/Tokyo",
+  "labels": ["renovate"],
+  "rangeStrategy": "pin",
+  "dependencyDashboard": true,
+  "prConcurrentLimit": 20,
+  "rebaseWhen": "conflicted",
+  "branchPrefix": "renovate/",
+  "branchBranches": ["develop"],
+  "commitMessagePrefix": "renovate: ",
+  "major": {
+    "stabilityDays": 7
+  },
+  "minor": {
+    "stabilityDays": 3
+  },
+  "patch": {
+    "stabilityDays": 2,
+    "automerge": true
+  },
+  "packageRules": [
+    {
+      "depTypeList": ["devDependencies"],
+      "automerge": true
+    },
+    {
+      "groupName": ["laravel/framework"],
+      "matchPackageNames": ["laravel/framework"]
+    },
+    {
+      "groupName": "all dependencies for the minor version (PHP)",
+      "matchLanguages": ["php"],
+      "matchUpdateTypes": ["minor"],
+      "excludePackageNames": ["laravel/framework"]
+    }
+  ],
+  "enabled": true
+}

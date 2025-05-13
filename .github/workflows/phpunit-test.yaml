@@ -46,13 +46,6 @@ jobs:
       - name: Check PHP Extensions
         run: php -m
 
-      - name: Decrypt env
-        run: |
-          echo "${{ secrets.LARAVEL_ENV_KEY }}" > .env.key
-          php artisan env:decrypt --key="$(cat .env.key)" --env=ci
-          cp .env.ci .env.testing
-        working-directory: src
-
       - name: Validate composer.json and composer.lock
         run: composer validate
         working-directory: src
@@ -61,6 +54,12 @@ jobs:
         run: composer install --prefer-dist --no-progress --no-suggest
         working-directory: src
 
+      - name: Decrypt env
+        run: |
+          echo "${{ secrets.LARAVEL_ENV_KEY }}" > .env.key
+          php artisan env:decrypt --key="$(cat .env.key)" --env=ci
+          cp .env.ci .env.testing
+        working-directory: src
 
       - name: Run test suite
         run: composer run-script test

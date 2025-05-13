@@ -100,12 +100,6 @@ php artisan env:decrypt --key=$(cat .env.key) --env=local
 
 ## 余談
 
-- Postfix の送信テスト
-
-  ```bash
-  php artisan tinker --execute="Mail::raw('Postfix 経由のテストです', function(\$m){ \$m->to('you@example.com')->subject('Postfix メールテスト'); });"
-  ```
-
 - さくらサーバーなどのVPSでLaravelの標準ディレクトリ構造をそのまま利用できない場合
 
   さくらサーバではドキュメントルートが固定（例: `/home/ユーザー名/www` または `/home/ユーザー名/public_html`）されるので、public/index.php, .htaccess 以外のファイルはWebから直接アクセスされてはいけない場所に配置する必要があります。<br>
@@ -176,4 +170,10 @@ php artisan env:decrypt --key=$(cat .env.key) --env=local
 
   $app->handleRequest(Request::capture());
 
+  ```
+
+- Postfix の送信テスト
+
+  ```bash
+  php artisan tinker --execute="Mail::raw('Postfix 経由のテストです', function(\$m){ \$m->to('you@example.com')->subject('Postfix メールテスト'); });"
   ```

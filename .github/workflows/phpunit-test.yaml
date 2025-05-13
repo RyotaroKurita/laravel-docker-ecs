@@ -46,9 +46,6 @@ jobs:
       - name: Check PHP Extensions
         run: php -m
 
-      - name: Copy .env.testing
-        run: cp packages/backend/docker/php/.env.testing packages/backend/laravel/.env.testing
-
       - name: Decrypt env
         run: |
           echo "${{ secrets.LARAVEL_ENV_KEY }}" > .env.key

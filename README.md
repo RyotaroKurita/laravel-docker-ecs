@@ -31,7 +31,7 @@
     php artisan key:generate
     ```
 
-    ⚠️ `.env` ファイルの取り扱いについては、後述の運用時の決まり事に気をつけてください。⚠️
+    ⚠️ `.env` ファイルの取り扱いについては、後述の「運用時の決まり事」に気をつけてください。⚠️
 
 3. 必要に応じてデータベースのマイグレーションを実行します。
 
@@ -100,8 +100,80 @@ php artisan env:decrypt --key=$(cat .env.key) --env=local
 
 ## 余談
 
-Postfix の送信テスト
+- さくらサーバーなどのVPSでLaravelの標準ディレクトリ構造をそのまま利用できない場合
 
-```bash
-php artisan tinker --execute="Mail::raw('Postfix 経由のテストです', function(\$m){ \$m->to('you@example.com')->subject('Postfix メールテスト'); });"
-```
+  さくらサーバではドキュメントルートが固定（例: `/home/ユーザー名/www` または `/home/ユーザー名/public_html`）されるので、public/index.php, .htaccess 以外のファイルはWebから直接アクセスされてはいけない場所に配置する必要があります。<br>
+  この場合は、Laravelのソースコードを `/home/ユーザー名/laravel` に配置し、public/index.php, .htaccess を `/home/ユーザー名/www` に配置することで、Laravelの標準ディレクトリ構造を維持しつつ、Webから直接アクセスされないようにすることができます。<br>
+  例えば、以下のような構成に変更します：
+
+  ```
+  /home/ユーザー名/
+  ├── laravel/              ← Laravel本体
+  │   ├── app/
+  │   ├── bootstrap/
+  │   ├── config/
+  │   ├── ...
+  │   └── public/           ← 元のpublic
+  └── www/                  ← Web公開用（さくらのドキュメントルート）
+      ├── index.php
+      └── .htaccess
+  ```
+
+  そして、`index.php` の中で `require/require_once` している箇所を変更後のディレクトリ構造に合わせると、Laravelのソースコードを正しく読み込むことができます。<br>
+  ただし、これを行うと、Laravelの標準ディレクトリ構造を維持することができなくなるため、Laravelのアップグレードやパッケージのインストール時に注意が必要です。<br>
+
+  変更前
+  ```php
+  <?php
+
+  use Illuminate\Foundation\Application;
+  use Illuminate\Http\Request;
+
+  define('LARAVEL_START', microtime(true));
+
+  // Determine if the application is in maintenance mode...
+  if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php')) {
+      require $maintenance;
+  }
+
+  // Register the Composer autoloader...
+  require __DIR__.'/../vendor/autoload.php';
+
+  // Bootstrap Laravel and handle the request...
+  /** @var Application $app */
+  $app = require_once __DIR__.'/../bootstrap/app.php';
+
+  $app->handleRequest(Request::capture());
+
+  ```
+
+  変更後
+  ```php
+  <?php
+
+  use Illuminate\Foundation\Application;
+  use Illuminate\Http\Request;
+
+  define('LARAVEL_START', microtime(true));
+
+  // Determine if the application is in maintenance mode...
+  if (file_exists($maintenance = __DIR__.'/../laravel/storage/framework/maintenance.php')) {
+      require $maintenance;
+  }
+
+  // Register the Composer autoloader...
+  require __DIR__.'/../laravel/vendor/autoload.php';
+
+  // Bootstrap Laravel and handle the request...
+  /** @var Application $app */
+  $app = require_once __DIR__.'/../laravel/bootstrap/app.php';
+
+  $app->handleRequest(Request::capture());
+
+  ```
+
+- Postfix の送信テスト
+
+  ```bash
+  php artisan tinker --execute="Mail::raw('Postfix 経由のテストです', function(\$m){ \$m->to('you@example.com')->subject('Postfix メールテスト'); });"
+  ```

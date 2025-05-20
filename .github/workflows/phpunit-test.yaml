@@ -1,0 +1,66 @@
+name: PHP Unit
+
+on:
+  pull_request:
+    # 対象：マージ先のブランチ
+    branches:
+      - main
+      - develop
+    # 対象：状態
+    types:
+      - opened
+      - reopened
+      - synchronize
+    # トリガー対象外ファイル
+    paths-ignore:
+      - 'README.md'
+  # 手動でGithubのActionsから実行できるようにする
+  workflow_dispatch:
+
+# 実行ジョブ（基本は並列で実行される）
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        php-version: ["8.4"]
+
+    steps:
+      - name: Setup PHP ${{ matrix.php-version }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: mbstring, xdebug, dom
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check PHP Version
+        run: php -v
+
+      - name: Check Composer Version
+        run: composer -V
+
+      - name: Check PHP Extensions
+        run: php -m
+
+      - name: Validate composer.json and composer.lock
+        run: composer validate
+        working-directory: src
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-suggest
+        working-directory: src
+
+      - name: Decrypt env
+        run: |
+          echo "${{ secrets.LARAVEL_ENV_KEY }}" > .env.key
+          php artisan env:decrypt --key="$(cat .env.key)" --env=ci
+          cp .env.ci .env.testing
+        working-directory: src
+
+      - name: Run test suite
+        run: composer run-script test
+        working-directory: src

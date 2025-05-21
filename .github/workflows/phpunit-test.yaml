@@ -5,7 +5,7 @@ on:
     # 対象：マージ先のブランチ
     branches:
       - main
-      - develop
+      # - develop
     # 対象：状態
     types:
       - opened

@@ -86,7 +86,8 @@ laravel12-docker-base/
 head -c 32 /dev/urandom | base64 | sed 's/^/base64:/' > .env.key
 ```
 
-暗号化（例：`.env.local`を暗号化して`.env.local.encrypted`を生成）
+暗号化（例：`.env.local`を暗号化して`.env.local.encrypted`を生成）<br>
+※ srcディレクトリに`.env.key`を配置して行なってください。
 
 ```bash
 php artisan env:encrypt --key=$(cat .env.key) --env=local (--force)

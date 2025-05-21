@@ -9,7 +9,7 @@
   "prConcurrentLimit": 20,
   "rebaseWhen": "conflicted",
   "branchPrefix": "renovate/",
-  "baseBranches": ["develop"],
+  "baseBranches": ["main"],
   "commitMessagePrefix": "renovate: ",
   "major": {
     "stabilityDays": 7

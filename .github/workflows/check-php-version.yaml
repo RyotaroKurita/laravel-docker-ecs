@@ -2,7 +2,6 @@
 name: PHP バージョン一致チェック
 
 on:
-  push:
   pull_request:
   workflow_dispatch:
 
@@ -11,9 +10,9 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      # ここをあなたの状況に合わせて変更
-      PROJECT_PATH: src                    # 例: "apps/api" など
-      DOCKER_IMAGE: amazonlinux:2023      # php が入っているアプリ用イメージ推奨
+      # チェック対象の Docker イメージを指定
+      PROJECT_PATH: src # 例: "apps/api" など
+      DOCKER_IMAGE: amazonlinux:2023 # php が入っているアプリ用イメージ推奨
 
     steps:
       - name: ソースコードをチェックアウト
@@ -47,6 +46,24 @@ jobs:
             echo "constraint=" >> "$GITHUB_OUTPUT"
             echo "source=none" >> "$GITHUB_OUTPUT"
           fi
+
+      - name: Docker イメージから PHP の実際のバージョンを取得
+        id: image
+        run: |
+          set -e
+          ACTUAL=$(
+            docker run --rm "$DOCKER_IMAGE" bash -lc '
+              set -e
+              # php が無ければインストール（AL2023）
+              if ! command -v php >/dev/null 2>&1; then
+                dnf -y update >/dev/null 2>&1 || true
+                dnf install -y php php-fpm php-cli
+              fi
+              php -r "echo PHP_VERSION;"
+            '
+          )
+          echo "actual=$ACTUAL" >> "$GITHUB_OUTPUT"
+          echo "イメージの PHP バージョン: $ACTUAL"
 
       - name: Docker イメージから PHP の実際のバージョンを取得
         id: image

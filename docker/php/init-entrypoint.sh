@@ -41,6 +41,7 @@ fi
 # FPMディレクトリが必要
 mkdir -p /run/php-fpm
 
+composer dump-autoload
 
 # サービス起動
 php-fpm --daemonize

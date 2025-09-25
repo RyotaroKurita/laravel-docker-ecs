@@ -61,7 +61,6 @@ jobs:
           fi
 
       - name: Docker イメージから PHP の実際のバージョンを取得
-        id: image
         run: |
           set -e
           ACTUAL=$(

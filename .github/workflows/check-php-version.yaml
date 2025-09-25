@@ -1,0 +1,80 @@
+# .github/workflows/php-version-check.yml
+name: PHP バージョン一致チェック
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  php-version-check:
+    runs-on: ubuntu-latest
+
+    env:
+      # チェック対象の Docker イメージを指定
+      DOCKER_IMAGE: amazonlinux:2023
+
+    steps:
+      - name: ソースコードをチェックアウト
+        uses: actions/checkout@v4
+
+      - name: jq をインストール
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: composer.json から PHP の制約を読み取り
+        id: composer
+        run: |
+          set -e
+          PLATFORM_PHP=$(jq -r '.config.platform.php // empty' composer.json)
+          REQUIRE_PHP=$(jq -r '.require.php // empty' composer.json)
+
+          if [ -n "$PLATFORM_PHP" ]; then
+            echo "constraint=$PLATFORM_PHP" >> "$GITHUB_OUTPUT"
+            echo "source=config.platform.php" >> "$GITHUB_OUTPUT"
+          elif [ -n "$REQUIRE_PHP" ]; then
+            echo "constraint=$REQUIRE_PHP" >> "$GITHUB_OUTPUT"
+            echo "source=require.php" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::composer.json に PHP バージョンの指定が見つかりません"
+            echo "constraint=" >> "$GITHUB_OUTPUT"
+            echo "source=none" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Docker イメージから PHP の実際のバージョンを取得
+        id: image
+        run: |
+          ACTUAL=$(docker run --rm "$DOCKER_IMAGE" php -r 'echo PHP_VERSION;')
+          echo "actual=$ACTUAL" >> "$GITHUB_OUTPUT"
+          echo "イメージの PHP バージョン: $ACTUAL"
+
+      - name: バージョンを比較 (semver を利用)
+        if: steps.composer.outputs.constraint != ''
+        run: |
+          set -e
+          npm init -y >/dev/null 2>&1
+          npm i semver@7 >/dev/null 2>&1
+
+          node - <<'EOF'
+          const semver = require('semver');
+
+          const actual = process.env.ACTUAL;
+          const constraint = process.env.CONSTRAINT;
+          const source = process.env.SOURCE;
+
+          const ok = semver.satisfies(semver.coerce(actual), constraint, { includePrerelease: true });
+
+          if (!ok) {
+            console.error(`❌ Docker イメージ内の PHP ${actual} は composer.json の ${source} (${constraint}) を満たしていません`);
+            process.exit(1);
+          } else {
+            console.log(`✅ Docker イメージ内の PHP ${actual} は composer.json の ${source} (${constraint}) を満たしています`);
+          }
+          EOF
+        env:
+          ACTUAL: ${{ steps.image.outputs.actual }}
+          CONSTRAINT: ${{ steps.composer.outputs.constraint }}
+          SOURCE: ${{ steps.composer.outputs.source }}
+
+      - name: バージョン指定がなかった場合の処理
+        if: steps.composer.outputs.constraint == ''
+        run: echo "::notice::composer.json に PHP のバージョン指定がなかったためチェックをスキップしました"

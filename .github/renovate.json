@@ -27,6 +27,12 @@
       "automerge": true
     },
     {
+      "matchManagers": ["composer"],
+      "matchPackageNames": ["php"],
+      "allowedVersions": ">=8.4 <8.5",
+      "rangeStrategy": "widen"
+    },
+    {
       "groupName": ["laravel/framework"],
       "matchPackageNames": ["laravel/framework"]
     },

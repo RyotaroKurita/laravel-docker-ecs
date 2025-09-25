@@ -60,23 +60,24 @@ jobs:
             echo "source=none" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Docker イメージから PHP の実際のバージョンを取得
+      - name: Docker イメージから PHP の実際のバージョンを取得（静かに取得）
         id: image
         run: |
           set -e
+          # dnf のログを絶対に標準出力へ出さない。標準エラーも捨てる。
           ACTUAL=$(
             docker run --rm "$DOCKER_IMAGE" bash -lc '
               set -e
-              # php が無ければインストール（AL2023）
               if ! command -v php >/dev/null 2>&1; then
-                dnf -y update >/dev/null 2>&1 || true
-                dnf install -y php php-fpm php-cli
+                # できるだけ静かにインストール（出力はすべて捨てる）
+                dnf -y -q update >/dev/null 2>&1 || true
+                dnf -y -q install php84-cli >/dev/null 2>&1 || \
+                dnf -y -q install php-cli   >/dev/null 2>&1
               fi
               php -r "echo PHP_VERSION;"
-            '
+            ' 2>/dev/null
           )
-          # 余計な空白/改行の混入を防ぐ
-          ACTUAL=$(echo -n "$ACTUAL" | tr -d "\r\n")
+          ACTUAL=$(echo -n "$ACTUAL" | tr -d '\r\n')
           echo "actual=$ACTUAL" >> "$GITHUB_OUTPUT"
           echo "イメージの PHP バージョン: $ACTUAL"
 

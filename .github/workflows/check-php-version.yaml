@@ -61,6 +61,7 @@ jobs:
           fi
 
       - name: Docker イメージから PHP の実際のバージョンを取得
+        id: image
         run: |
           set -e
           ACTUAL=$(
@@ -74,15 +75,8 @@ jobs:
               php -r "echo PHP_VERSION;"
             '
           )
-          echo "actual=$ACTUAL" >> "$GITHUB_OUTPUT"
-          echo "イメージの PHP バージョン: $ACTUAL"
-
-      - name: Docker イメージから PHP の実際のバージョンを取得
-        id: image
-        run: |
-          set -e
-          # アプリ用イメージ（php コマンドが入っている前提）
-          ACTUAL=$(docker run --rm "$DOCKER_IMAGE" php -r 'echo PHP_VERSION;')
+          # 余計な空白/改行の混入を防ぐ
+          ACTUAL=$(echo -n "$ACTUAL" | tr -d "\r\n")
           echo "actual=$ACTUAL" >> "$GITHUB_OUTPUT"
           echo "イメージの PHP バージョン: $ACTUAL"
 

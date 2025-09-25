@@ -29,7 +29,7 @@ jobs:
 
     steps:
       - name: ソースコードをチェックアウト
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: jq をインストール
         run: sudo apt-get update && sudo apt-get install -y jq

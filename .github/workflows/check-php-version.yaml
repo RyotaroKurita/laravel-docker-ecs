@@ -3,6 +3,19 @@ name: PHP バージョン一致チェック
 
 on:
   pull_request:
+    # 対象：マージ先のブランチ
+    branches:
+      - main
+      # - develop
+    # 対象：状態
+    types:
+      - opened
+      - reopened
+      - synchronize
+    # トリガー対象外ファイル
+    paths-ignore:
+      - 'README.md'
+  # 手動でGithubのActionsから実行できるようにする
   workflow_dispatch:
 
 jobs:

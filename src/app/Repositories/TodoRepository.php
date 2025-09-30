@@ -19,6 +19,10 @@ class TodoRepository
   public function updateTodo(int $id, array $data)
   {
     $todo = Todo::find($id);
+    if (!$todo) {
+      return null;
+    }
+
     $todo->update($data);
     return $todo;
   }
@@ -26,6 +30,10 @@ class TodoRepository
   public function deleteTodo(int $id)
   {
     $todo = Todo::find($id);
+    if (!$todo) {
+      return false;
+    }
+
     return $todo->delete();
   }
 }

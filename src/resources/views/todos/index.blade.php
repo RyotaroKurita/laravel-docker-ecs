@@ -27,12 +27,12 @@
     @forelse ($todos as $todo)
       <li class="flex items-center justify-between border-b py-2">
         <div>
-          <span class="{{ $todo->is_done ? 'line-through text-gray-500' : '' }}">
+          <span class="{{ $todo->is_completed ? 'line-through text-gray-500' : '' }}">
             {{ $todo->title }}
           </span>
         </div>
         <div class="flex space-x-2">
-          @if (!$todo->is_done)
+          @if (!$todo->is_completed)
             <form action="{{ route('todos.complete', $todo->id) }}" method="POST">
               @csrf
               @method('PATCH')

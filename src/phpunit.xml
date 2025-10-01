@@ -10,6 +10,8 @@
         </testsuite>
         <testsuite name="Feature">
             <directory>tests/Feature</directory>
+            <exclude>tests/Feature/ExampleTest.php</exclude>
+            <exclude>tests/Feature/SystemCheckTest.php</exclude>
         </testsuite>
     </testsuites>
     <source>

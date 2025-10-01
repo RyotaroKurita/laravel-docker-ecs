@@ -17,6 +17,11 @@
     "vite": "^7.1.7"
   },
   "lint-staged": {
-    "test.php": "prettier --write"
+    "app/Http/**/*.php" : "prettier --write",
+    "app/Helpers/**/*.php" : "prettier --write",
+    "app/Models/*.php" : "prettier --write",
+    "app/Providers/*.php" : "prettier --write",
+    "resources/Repositories/*.php" : "prettier --write",
+    "resources/Services/*.php" : "prettier --write"
   }
 }

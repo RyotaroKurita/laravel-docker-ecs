@@ -17,6 +17,6 @@
     "vite": "^7.1.7"
   },
   "lint-staged": {
-    "my_test.php": "prettier --write"
+    "test.php": "prettier --write"
   }
 }

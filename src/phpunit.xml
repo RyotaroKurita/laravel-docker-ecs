@@ -19,9 +19,7 @@
     </source>
     <coverage>
         <report>
-            <clover outputFile="coverage/clover.xml"/>
-            <html outputDirectory="coverage/html"/>
-            <text outputFile="coverage/coverage.txt"/>
+            <text outputFile="php://stdout"/>
         </report>
     </coverage>
     <php>

@@ -33,6 +33,7 @@ jobs:
         with:
           php-version: ${{ matrix.php-version }}
           extensions: mbstring, xdebug, dom
+          coverage: xdebug
 
       - name: Checkout
         uses: actions/checkout@v5
@@ -65,18 +66,16 @@ jobs:
         run: mkdir -p coverage
         working-directory: src
 
+      - name: Check xdebug status
+        run: php -m | grep -i xdebug
+        working-directory: src
+
       - name: Run test suite with coverage
-        run: php artisan test --coverage --coverage-clover=coverage/clover.xml --coverage-text=coverage/coverage.txt --coverage-html=coverage/html
+        run: php artisan test --coverage
         working-directory: src
 
       - name: Display coverage summary
-        run: |
-          if [ -f coverage/coverage.txt ]; then
-            echo "=== Code Coverage Summary ==="
-            cat coverage/coverage.txt
-          else
-            echo "Coverage text file not found"
-          fi
+        run: echo "Coverage displayed in test output above"
         working-directory: src
 
       - name: Upload coverage reports

@@ -61,6 +61,29 @@ jobs:
           cp .env.ci .env.testing
         working-directory: src
 
-      - name: Run test suite
-        run: composer run-script test
+      - name: Create coverage directory
+        run: mkdir -p coverage
         working-directory: src
+
+      - name: Run test suite with coverage
+        run: php artisan test --coverage --coverage-clover=coverage/clover.xml --coverage-text=coverage/coverage.txt --coverage-html=coverage/html
+        working-directory: src
+
+      - name: Display coverage summary
+        run: |
+          if [ -f coverage/coverage.txt ]; then
+            echo "=== Code Coverage Summary ==="
+            cat coverage/coverage.txt
+          else
+            echo "Coverage text file not found"
+          fi
+        working-directory: src
+
+      - name: Upload coverage reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-reports
+          path: |
+            src/coverage/
+          retention-days: 30

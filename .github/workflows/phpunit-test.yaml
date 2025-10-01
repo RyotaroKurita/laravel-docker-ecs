@@ -25,7 +25,7 @@ jobs:
 
     strategy:
       matrix:
-        php-version: ["8.3"]
+        php-version: ["8.4"]
 
     steps:
       - name: Setup PHP ${{ matrix.php-version }}
@@ -54,13 +54,64 @@ jobs:
         run: composer install --prefer-dist --no-progress --no-suggest
         working-directory: src
 
-      - name: Decrypt env
+      - name: Setup testing environment
         run: |
-          echo "${{ secrets.LARAVEL_ENV_KEY }}" > .env.key
-          php artisan env:decrypt --key="$(cat .env.key)" --env=ci
-          cp .env.ci .env.testing
+          # Create a basic .env.testing file for CI
+          cat > .env.testing << 'EOF'
+          APP_NAME="Laravel Todo App"
+          APP_ENV=testing
+          APP_KEY=base64:$(php -r "echo base64_encode(random_bytes(32));")
+          APP_DEBUG=false
+          APP_URL=http://localhost
+          APP_TIMEZONE=Asia/Tokyo
+          
+          # Database (SQLite in memory for fast testing)
+          DB_CONNECTION=sqlite
+          DB_DATABASE=:memory:
+          
+          # Cache and Session (array for testing)
+          CACHE_STORE=array
+          SESSION_DRIVER=array
+          
+          # Mail (array to prevent actual sending)
+          MAIL_MAILER=array
+          
+          # Queue (sync for immediate execution)
+          QUEUE_CONNECTION=sync
+          
+          # Logging
+          LOG_CHANNEL=stderr
+          
+          # Performance optimizations for testing
+          BCRYPT_ROUNDS=4
+          
+          # Disable features not needed in CI
+          TELESCOPE_ENABLED=false
+          PULSE_ENABLED=false
+          EOF
+          echo "Created .env.testing file successfully"
+        working-directory: src
+
+      - name: Verify environment setup
+        run: |
+          echo "=== Verifying environment setup ==="
+          ls -la .env*
+          echo "=== Checking APP_KEY ==="
+          grep "APP_KEY" .env.testing
+          echo "=== Testing database connection ==="
+          php artisan config:show database.default
         working-directory: src
 
       - name: Run test suite
-        run: php artisan test
+        run: |
+          echo "=== Starting Laravel tests ==="
+          php artisan test --verbose
+          TEST_EXIT_CODE=$?
+          echo "=== Test execution completed with exit code: $TEST_EXIT_CODE ==="
+          if [ $TEST_EXIT_CODE -eq 0 ]; then
+            echo "✅ All tests passed successfully!"
+          else
+            echo "❌ Tests failed with exit code: $TEST_EXIT_CODE"
+            exit $TEST_EXIT_CODE
+          fi
         working-directory: src

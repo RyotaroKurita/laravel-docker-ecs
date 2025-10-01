@@ -24,6 +24,7 @@
     "src/app/Repositories/*.php": "prettier --write",
     "src/app/Services/*.php": "prettier --write",
     "src/app/Mail/*.php": "prettier --write",
-    "src/app/Library/**/*.php": "prettier --write"
+    "src/app/Library/**/*.php": "prettier --write",
+    "src/test.php": "prettier --write"
   }
 }

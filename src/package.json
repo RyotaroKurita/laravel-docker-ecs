@@ -17,11 +17,13 @@
     "vite": "^7.1.7"
   },
   "lint-staged": {
-    "app/Http/**/*.php" : "prettier --write",
-    "app/Helpers/**/*.php" : "prettier --write",
-    "app/Models/*.php" : "prettier --write",
-    "app/Providers/*.php" : "prettier --write",
-    "resources/Repositories/*.php" : "prettier --write",
-    "resources/Services/*.php" : "prettier --write"
+    "src/app/Http/**/*.php": "prettier --write",
+    "src/app/Helpers/**/*.php": "prettier --write",
+    "src/app/Models/*.php": "prettier --write",
+    "src/app/Providers/*.php": "prettier --write",
+    "src/app/Repositories/*.php": "prettier --write",
+    "src/app/Services/*.php": "prettier --write",
+    "src/app/Mail/*.php": "prettier --write",
+    "src/app/Library/**/*.php": "prettier --write"
   }
 }

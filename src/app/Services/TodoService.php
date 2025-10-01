@@ -29,6 +29,6 @@ class TodoService {
 
   public function deleteTodo(int $id) {
     
-         return $this->repo->deleteTodo($id);
+    return $this->repo->deleteTodo($id);
   }
 }
